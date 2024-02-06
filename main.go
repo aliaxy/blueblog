@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	r := router.Setup()
+	r := router.Setup(settings.Conf.Mode)
 
 	err := r.Run(fmt.Sprintf(":%d", settings.Conf.Port))
 	if err != nil {
