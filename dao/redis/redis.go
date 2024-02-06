@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"main/settings"
+	"blueblog/settings"
 
 	"github.com/redis/go-redis/v9"
 )

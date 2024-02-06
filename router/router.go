@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"main/controller"
-	"main/logger"
+	"blueblog/controller"
+	"blueblog/logger"
 
 	"github.com/gin-gonic/gin"
 )

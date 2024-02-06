@@ -1,8 +1,8 @@
-name: "web_app"
-mode: "dev"
+name: "blueblog"
+mode: "release"
 port: 8080
 version: "v0.0.1"
-start_time: "2020-07-01"
+start_time: "2023-07-01"
 machine_id: 1
 
 auth:
@@ -10,7 +10,7 @@ auth:
 
 log:
   level: "debug"
-  filename: "web_app.log"
+  filename: "blueblog.log"
   max_size: 200
   max_age: 30
   max_backups: 7
@@ -20,7 +20,7 @@ mysql:
   port: 13306
   user: "root"
   password: "211010"
-  dbname: "sql_demo"
+  dbname: "blueblog"
   max_open_conns: 200
   max_idle_conns: 50
 

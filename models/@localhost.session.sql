@@ -1,4 +1,6 @@
-USE bluebell;
+DROP database IF EXISTS bluebell;
+CREATE database blueblog DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE blueblog;
 CREATE TABLE `user` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `user_id` bigint(20) NOT NULL,

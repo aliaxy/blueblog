@@ -3,7 +3,7 @@ package mysql
 import (
 	"fmt"
 
-	"main/settings"
+	"blueblog/settings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -18,7 +18,7 @@ func Init(cfg *settings.MySQLConfig) (err error) {
 		cfg.Password,
 		cfg.Host,
 		cfg.Port,
-		cfg.Dbname,
+		cfg.DB,
 	)
 
 	db, err = sqlx.Connect("mysql", dsn)
