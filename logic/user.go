@@ -3,6 +3,7 @@ package logic
 import (
 	"blueblog/dao/mysql"
 	"blueblog/models"
+	"blueblog/pkg/jwt"
 	"blueblog/pkg/snowflake"
 )
 
@@ -26,10 +27,15 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	return mysql.InsertUser(user)
 }
 
-func Login(p *models.ParamLogin) (err error) {
+func Login(p *models.ParamLogin) (token string, err error) {
 	user := &models.User{
 		Username: p.Username,
 		Password: p.Password,
 	}
-	return mysql.Login(user)
+
+	if err := mysql.Login(user); err != nil {
+		return "", err
+	}
+
+	return jwt.GetToken(user.UserID, user.Username)
 }
