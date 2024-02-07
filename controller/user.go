@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"strconv"
 
 	"blueblog/dao/mysql"
 	"blueblog/logic"
@@ -65,7 +66,7 @@ func LoginHandler(ctx *gin.Context) {
 	}
 
 	// 业务逻辑处理
-	token, err := logic.Login(p)
+	user, err := logic.Login(p)
 	if err != nil {
 		zap.L().Error("logic.login failed", zap.String("username", p.Username), zap.Error(err))
 		if errors.Is(err, mysql.ErrorUserNotExist) {
@@ -77,5 +78,9 @@ func LoginHandler(ctx *gin.Context) {
 	}
 
 	// 返回响应
-	ResponseSuccess(ctx, token)
+	ResponseSuccess(ctx, gin.H{
+		"user_id":   strconv.FormatInt(user.UserID, 10),
+		"user_name": user.Username,
+		"token":     user.Token,
+	})
 }
