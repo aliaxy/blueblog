@@ -19,13 +19,18 @@ func Setup(mode string) *gin.Engine {
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
-	r.POST("/signup", controller.SignUpHandler)
+	v1 := r.Group("/api/v1")
+	// 注册
+	v1.POST("/signup", controller.SignUpHandler)
 
-	r.POST("/login", controller.LoginHandler)
+	// 登录
+	v1.POST("/login", controller.LoginHandler)
 
-	r.GET("/ping", middleware.JWTAuthMiddleware(), func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "pong")
-	})
+	v1.Use(middleware.JWTAuthMiddleware())
+	{
+		v1.GET("/community", controller.CommunityHandler)
+		v1.GET("/community/:id", controller.CommunityDetailHandler)
+	}
 
 	r.NoRoute(func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
