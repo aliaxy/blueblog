@@ -63,3 +63,18 @@ func PostDetailHandler(ctx *gin.Context) {
 	// 返回响应
 	ResponseSuccess(ctx, data)
 }
+
+// PostListHandler
+func PostListHandler(ctx *gin.Context) {
+	page, size := GetPageInfo(ctx)
+
+	// 获取数据
+	data, err := logic.GetPostList(page, size)
+	if err != nil {
+		zap.L().Error("logic.GetPostList() failed", zap.Error(err))
+		ResponseError(ctx, CodeServerBusy)
+		return
+	}
+	// 返回响应
+	ResponseSuccess(ctx, data)
+}
