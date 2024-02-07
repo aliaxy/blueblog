@@ -41,7 +41,7 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-	if token.Valid { // 校验token
+	if token.Valid { // 校验 token
 		return mc, nil
 	}
 	return nil, errors.New("invalid token")
