@@ -7,6 +7,7 @@ import (
 	"blueblog/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 )
 
@@ -77,4 +78,38 @@ func PostListHandler(ctx *gin.Context) {
 	}
 	// 返回响应
 	ResponseSuccess(ctx, data)
+}
+
+// PostVoteHandler
+func PostVoteHandler(ctx *gin.Context) {
+	// 获取数据
+	p := new(models.ParamVoteData)
+	if err := ctx.ShouldBindJSON(p); err != nil {
+		zap.L().Error("ctx.ShouldBindJSON(p) failed", zap.Error(err))
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			ResponseError(ctx, CodeInvalidParams)
+			return
+		}
+		errData := removeTopStruct(errs.Translate(trans))
+		ResponseErrorWithMsg(ctx, CodeInvalidParams, errData)
+		return
+	}
+
+	// 获取用户 ID
+	userID, err := getCurrentUser(ctx)
+	if err != nil {
+		ResponseError(ctx, CodeNeedLogin)
+		return
+	}
+
+	// 具体业务
+	if err := logic.VoteForPost(userID, p); err != nil {
+		zap.L().Error("logic.VoteForPost(userID, p) failed", zap.Error(err))
+		ResponseError(ctx, CodeServerBusy)
+		return
+	}
+
+	// 返回响应
+	ResponseSuccess(ctx, nil)
 }

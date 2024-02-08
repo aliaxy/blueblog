@@ -1,7 +1,10 @@
 package logic
 
 import (
+	"strconv"
+
 	"blueblog/dao/mysql"
+	"blueblog/dao/redis"
 	"blueblog/models"
 	"blueblog/pkg/snowflake"
 
@@ -13,7 +16,11 @@ func CreatePost(post *models.Post) (err error) {
 	post.ID = snowflake.GenID()
 
 	// 保存到数据库
-	return mysql.CreatePost(post)
+	err = mysql.CreatePost(post)
+	if err != nil {
+		return
+	}
+	return redis.CreatePost(post.ID)
 }
 
 func GetPostByID(pid int64) (data *models.ApiPostDetail, err error) {
@@ -83,4 +90,17 @@ func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
 		data = append(data, postDetail)
 	}
 	return
+}
+
+// VoteForPost 为帖子投票
+// 自发表一个星期内允许投票，之后不允许投票
+// 到期之后将 redis 中保存的数据存储到 mysql 中
+// 到期之后删除 KeyPostVotedPrefix
+
+func VoteForPost(userID int64, p *models.ParamVoteData) error {
+	zap.L().Debug("VoteForPost",
+		zap.Int64("userID", userID),
+		zap.String("postID", p.PostID),
+		zap.Int8("direction", p.Direction))
+	return redis.VoteForPost(strconv.FormatInt(userID, 10), p.PostID, float64(p.Direction))
 }
