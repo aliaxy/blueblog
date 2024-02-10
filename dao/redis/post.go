@@ -5,6 +5,8 @@ import (
 	"math"
 	"time"
 
+	"blueblog/models"
+
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
@@ -72,4 +74,19 @@ func VoteForPost(userID, postID string, value float64) error {
 
 	_, err := pipeline.Exec(ctx)
 	return err
+}
+
+func GetPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
+	// 从 redis 获取 ID
+	key := getRedisKey(KeyPostTime)
+	if p.Order == models.OrderScore {
+		key = getRedisKey(KeyPostScore)
+	}
+
+	// 确定查询的索引起始点
+	start := (p.Page - 1) * p.Size
+	end := start + p.Size - 1
+
+	// ZREVRANGE 按指定元素从大到小查询指定数量元素
+	return client.ZRevRange(ctx, key, start, end).Result()
 }

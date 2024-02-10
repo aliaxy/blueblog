@@ -96,11 +96,51 @@ func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
 // 自发表一个星期内允许投票，之后不允许投票
 // 到期之后将 redis 中保存的数据存储到 mysql 中
 // 到期之后删除 KeyPostVotedPrefix
-
 func VoteForPost(userID int64, p *models.ParamVoteData) error {
 	zap.L().Debug("VoteForPost",
 		zap.Int64("userID", userID),
 		zap.String("postID", p.PostID),
 		zap.Int8("direction", p.Direction))
 	return redis.VoteForPost(strconv.FormatInt(userID, 10), p.PostID, float64(p.Direction))
+}
+
+func GetPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	// redis 查询 ID 列表
+	ids, err := redis.GetPostIDsInOrder(p)
+	if err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		zap.L().Warn("redis.GetPostIDsInOrder(p) return 0 data")
+		return
+	}
+	// 根据 ID 去 mysql 数据库查询帖子详细信息
+	posts, err := mysql.GetPostListByIDs(ids)
+
+	for _, post := range posts {
+		// 根据作者 ID 查询作者信息
+		user, err := mysql.GetUserByID(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql.GetUserByID(post.AuthorID) failed",
+				zap.Int64("author_id", post.AuthorID),
+				zap.Error(err))
+			return nil, err
+		}
+
+		// 根据社区 ID 查询社区信息
+		community, err := mysql.GetCommunityDetailByID(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql.GetCommunityDetailByID(post.CommunityID) failed",
+				zap.Int64("community_id", post.CommunityID),
+				zap.Error(err))
+			return nil, err
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName:      user.Username,
+			Post:            post,
+			CommunityDetail: community,
+		}
+		data = append(data, postDetail)
+	}
+	return
 }

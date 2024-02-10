@@ -113,3 +113,30 @@ func PostVoteHandler(ctx *gin.Context) {
 	// 返回响应
 	ResponseSuccess(ctx, nil)
 }
+
+// PostListHandler2 升级的帖子列表接口
+// 根据前端传来的参数动态获取帖子列表（创建时间 or 分数）
+func PostListHandler2(ctx *gin.Context) {
+	// /api/v1/posts?page=1&size=10&order=time
+	// 获取分页参数
+	p := &models.ParamPostList{
+		Page:  1,
+		Size:  10,
+		Order: models.OrderTime,
+	}
+	if err := ctx.ShouldBindQuery(p); err != nil {
+		zap.L().Error("PostListHandler2 with invalid params", zap.Error(err))
+		ResponseError(ctx, CodeInvalidParams)
+		return
+	}
+
+	// 获取数据
+	data, err := logic.GetPostList2(p)
+	if err != nil {
+		zap.L().Error("logic.GetPostList() failed", zap.Error(err))
+		ResponseError(ctx, CodeServerBusy)
+		return
+	}
+	// 返回响应
+	ResponseSuccess(ctx, data)
+}

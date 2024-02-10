@@ -1,5 +1,10 @@
 package models
 
+const (
+	OrderTime  = "time"
+	OrderScore = "score"
+)
+
 // 定义请求参数的结构体
 
 // ParamSignUp 注册请求参数
@@ -19,4 +24,11 @@ type ParamLogin struct {
 type ParamVoteData struct {
 	PostID    string `json:"post_id" binding:"required,min=1"`
 	Direction int8   `json:"direction" binding:"oneof=1 0 -1"`
+}
+
+// ParamPostList 获取帖子列表参数
+type ParamPostList struct {
+	Page  int64  `json:"page" form:"page"`
+	Size  int64  `json:"size" form:"size"`
+	Order string `json:"order" form:"order"`
 }
