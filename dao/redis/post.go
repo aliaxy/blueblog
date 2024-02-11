@@ -16,7 +16,10 @@ const (
 	scorePerVote     = 432 // 每一票的分数
 )
 
-var ErrVoteTimeExpire = errors.New("投票时间已过")
+var (
+	ErrVoteTimeExpire = errors.New("投票时间已过")
+	ErrVoteRepeated   = errors.New("不允许重复投票")
+)
 
 func CreatePost(postID int64) error {
 	pipeline := client.TxPipeline()
@@ -48,7 +51,10 @@ func VoteForPost(userID, postID string, value float64) error {
 	// 更新帖子分数
 	// 查投票记录
 	oValue := client.ZScore(ctx, getRedisKey(KeyPostVotedPrefix+postID), userID).Val()
-
+	// 不允许重复投票
+	if oValue == value {
+		return ErrVoteRepeated
+	}
 	var dir float64
 	if value > oValue {
 		dir = 1
@@ -89,4 +95,32 @@ func GetPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
 
 	// ZREVRANGE 按指定元素从大到小查询指定数量元素
 	return client.ZRevRange(ctx, key, start, end).Result()
+}
+
+// GetPostVoteData 根据 ids 查询每篇帖子的投赞成票的数据
+func GetPostVoteData(ids []string) (data []int64, err error) {
+	// data = make([]int64, 0, len(ids))
+	// for _, id := range ids {
+	// 	key := getRedisKey(KeyPostVotedPrefix + id)
+	// 	// 查找 key
+	// 	v := client.ZCount(ctx, key, "1", "1").Val()
+	// 	data = append(data, v)
+	// }
+
+	// 使用 pipeline 一次发送多条命令 减少 RTT
+	pipeline := client.Pipeline()
+	for _, id := range ids {
+		key := getRedisKey(KeyPostVotedPrefix + id)
+		pipeline.ZCount(ctx, key, "1", "1")
+	}
+	cmders, err := pipeline.Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	data = make([]int64, 0, len(cmders))
+	for _, cmder := range cmders {
+		v := cmder.(*redis.IntCmd).Val()
+		data = append(data, v)
+	}
+	return
 }

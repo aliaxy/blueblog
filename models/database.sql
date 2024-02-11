@@ -57,8 +57,8 @@ INSERT INTO `community`
 VALUES (
         '4',
         '4',
-        'LOL',
-        '欢迎来到英雄联盟!',
+        'APEX',
+        '欢迎来到APEX Legends!',
         '2016-01-01 08:00:00',
         '2016-01-01 08:00:00'
     );

@@ -116,6 +116,9 @@ func PostVoteHandler(ctx *gin.Context) {
 
 // PostListHandler2 升级的帖子列表接口
 // 根据前端传来的参数动态获取帖子列表（创建时间 or 分数）
+// 获取请求参数
+// 去 redis 查 ID 列表
+// 根据 ID 去数据库查询帖子详细信息
 func PostListHandler2(ctx *gin.Context) {
 	// /api/v1/posts?page=1&size=10&order=time
 	// 获取分页参数
@@ -124,6 +127,7 @@ func PostListHandler2(ctx *gin.Context) {
 		Size:  10,
 		Order: models.OrderTime,
 	}
+
 	if err := ctx.ShouldBindQuery(p); err != nil {
 		zap.L().Error("PostListHandler2 with invalid params", zap.Error(err))
 		ResponseError(ctx, CodeInvalidParams)
