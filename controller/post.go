@@ -114,11 +114,17 @@ func PostVoteHandler(ctx *gin.Context) {
 	ResponseSuccess(ctx, nil)
 }
 
-// PostListHandler2 升级的帖子列表接口
-// 根据前端传来的参数动态获取帖子列表（创建时间 or 分数）
-// 获取请求参数
-// 去 redis 查 ID 列表
-// 根据 ID 去数据库查询帖子详细信息
+// PostListHandler2
+// @Summary 升级版帖子列表接口
+// @Description 可按社区按时间或分数排序查询帖子列表接口
+// @Tags 帖子相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param Authorization header string false "Bearer 用户令牌"
+// @Param object query models.ParamPostList false "查询参数"
+// @Security ApiKeyAuth
+// @Success 200 {object} _ResponsePostList
+// @Router /posts2 [get]
 func PostListHandler2(ctx *gin.Context) {
 	// /api/v1/posts?page=1&size=10&order=time
 	// 获取分页参数

@@ -8,6 +8,11 @@ import (
 	"blueblog/middleware"
 
 	"github.com/gin-gonic/gin"
+
+	_ "blueblog/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Setup(mode string) *gin.Engine {
@@ -18,6 +23,8 @@ func Setup(mode string) *gin.Engine {
 	r := gin.New()
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/api/v1")
 	// 注册
