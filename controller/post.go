@@ -135,12 +135,43 @@ func PostListHandler2(ctx *gin.Context) {
 	}
 
 	// 获取数据
-	data, err := logic.GetPostList2(p)
+	data, err := logic.GetPostListNew(p)
 	if err != nil {
 		zap.L().Error("logic.GetPostList() failed", zap.Error(err))
 		ResponseError(ctx, CodeServerBusy)
 		return
 	}
+
 	// 返回响应
 	ResponseSuccess(ctx, data)
 }
+
+// GetCommunityPostListHandler 根据社区查询帖子列表
+// func GetCommunityPostListHandler(ctx *gin.Context) {
+// 	// 初始化参数
+// 	p := &models.ParamCommunityPostList{
+// 		ParamPostList: &models.ParamPostList{
+// 			Page:  1,
+// 			Size:  10,
+// 			Order: models.OrderTime,
+// 		},
+// 		CommunityID: 0,
+// 	}
+
+// 	if err := ctx.ShouldBindQuery(p); err != nil {
+// 		zap.L().Error("GetCommunityPostListHandler with invalid params", zap.Error(err))
+// 		ResponseError(ctx, CodeInvalidParams)
+// 		return
+// 	}
+
+// 	// 获取数据
+// 	data, err := logic.GetCommunityPostList(p)
+// 	if err != nil {
+// 		zap.L().Error("logic.GetPostList() failed", zap.Error(err))
+// 		ResponseError(ctx, CodeServerBusy)
+// 		return
+// 	}
+
+// 	// 返回响应
+// 	ResponseSuccess(ctx, data)
+// }

@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"math"
+	"strconv"
 	"time"
 
 	"blueblog/models"
@@ -21,7 +22,7 @@ var (
 	ErrVoteRepeated   = errors.New("不允许重复投票")
 )
 
-func CreatePost(postID int64) error {
+func CreatePost(postID, communityID int64) error {
 	pipeline := client.TxPipeline()
 	// 帖子时间
 	pipeline.ZAdd(ctx, getRedisKey(KeyPostTime), redis.Z{
@@ -34,6 +35,10 @@ func CreatePost(postID int64) error {
 		Score:  float64(time.Now().Unix()),
 		Member: postID,
 	})
+
+	// 把帖子 ID 加到社区的 set
+	cKey := getRedisKey(KeyCommunityPrefix + strconv.FormatInt(communityID, 10))
+	pipeline.SAdd(ctx, cKey, postID)
 
 	_, err := pipeline.Exec(ctx)
 
@@ -82,6 +87,15 @@ func VoteForPost(userID, postID string, value float64) error {
 	return err
 }
 
+func getIDsFromKey(key string, page, size int64) ([]string, error) {
+	// 确定查询的索引起始点
+	start := (page - 1) * size
+	end := start + size - 1
+
+	// ZREVRANGE 按指定元素从大到小查询指定数量元素
+	return client.ZRevRange(ctx, key, start, end).Result()
+}
+
 func GetPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
 	// 从 redis 获取 ID
 	key := getRedisKey(KeyPostTime)
@@ -89,12 +103,7 @@ func GetPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
 		key = getRedisKey(KeyPostScore)
 	}
 
-	// 确定查询的索引起始点
-	start := (p.Page - 1) * p.Size
-	end := start + p.Size - 1
-
-	// ZREVRANGE 按指定元素从大到小查询指定数量元素
-	return client.ZRevRange(ctx, key, start, end).Result()
+	return getIDsFromKey(key, p.Page, p.Size)
 }
 
 // GetPostVoteData 根据 ids 查询每篇帖子的投赞成票的数据
@@ -123,4 +132,35 @@ func GetPostVoteData(ids []string) (data []int64, err error) {
 		data = append(data, v)
 	}
 	return
+}
+
+// GetCommunityPostIDsInOrder 根据社区查询 IDs
+func GetCommunityPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
+	orderKey := getRedisKey(KeyPostTime)
+	if p.Order == models.OrderScore {
+		orderKey = getRedisKey(KeyPostScore)
+	}
+
+	// 使用 zinterstore 把分区的帖子 set 与帖子分数的 zset 生成一个新的 zset
+	// 对新的 zset 操作
+
+	// 社区的 key
+	cKey := getRedisKey(KeyCommunityPrefix + strconv.FormatInt(p.CommunityID, 10))
+
+	key := orderKey + strconv.FormatInt(p.CommunityID, 10)
+	if client.Exists(ctx, orderKey).Val() < 1 {
+		// 因为是第一次查询，需要根据 post 的 create_time 给 post 分数
+		pipeline := client.Pipeline()
+		pipeline.ZInterStore(ctx, key, &redis.ZStore{
+			Keys:      []string{cKey, orderKey},
+			Aggregate: "MAX",
+		})
+		pipeline.Expire(ctx, key, 60*time.Second)
+		_, err := pipeline.Exec(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return getIDsFromKey(key, p.Page, p.Size)
 }

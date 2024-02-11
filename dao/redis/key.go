@@ -5,6 +5,7 @@ const (
 	KeyPostTime        = "post:time"   // zset: 帖子及发帖时间
 	KeyPostScore       = "post:score"  // zset: 帖子及投票
 	KeyPostVotedPrefix = "post:voted:" // zset: 记录用户为帖子投票的数据
+	KeyCommunityPrefix = "community:"  // set: 记录每个社区下的帖子id
 )
 
 // getRedisKey 给 redis key 加上前缀
