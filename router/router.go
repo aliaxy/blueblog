@@ -2,15 +2,15 @@ package router
 
 import (
 	"net/http"
+	"time"
 
 	"blueblog/controller"
+	_ "blueblog/docs"
 	"blueblog/logger"
 	"blueblog/middleware"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-
-	_ "blueblog/docs"
-
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -22,9 +22,13 @@ func Setup(mode string) *gin.Engine {
 
 	r := gin.New()
 
-	r.Use(logger.GinLogger(), logger.GinRecovery(true))
+	r.Use(logger.GinLogger(), logger.GinRecovery(true), middleware.RateLimitMiddleware(2*time.Second, 1))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "pong")
+	})
 
 	v1 := r.Group("/api/v1")
 	// 注册
@@ -45,6 +49,8 @@ func Setup(mode string) *gin.Engine {
 
 		v1.POST("/vote", controller.PostVoteHandler)
 	}
+
+	pprof.Register(r) // 注册 pprof 相关路由
 
 	r.NoRoute(func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
