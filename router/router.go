@@ -2,7 +2,6 @@ package router
 
 import (
 	"net/http"
-	"time"
 
 	"blueblog/controller"
 	_ "blueblog/docs"
@@ -22,9 +21,16 @@ func Setup(mode string) *gin.Engine {
 
 	r := gin.New()
 
-	r.Use(logger.GinLogger(), logger.GinRecovery(true), middleware.RateLimitMiddleware(2*time.Second, 1))
+	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.LoadHTMLFiles("./templates/index.html")
+	r.Static("/static", "./static")
+
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
 
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "pong")
@@ -36,6 +42,7 @@ func Setup(mode string) *gin.Engine {
 
 	// 登录
 	v1.POST("/login", controller.LoginHandler)
+	v1.GET("/posts2", controller.PostListHandler2)
 
 	v1.Use(middleware.JWTAuthMiddleware())
 	{
@@ -44,7 +51,6 @@ func Setup(mode string) *gin.Engine {
 
 		v1.POST("/post", controller.CreatePostHandler)
 		v1.GET("/posts", controller.PostListHandler)
-		v1.GET("/posts2", controller.PostListHandler2)
 		v1.GET("/post/:id", controller.PostDetailHandler)
 
 		v1.POST("/vote", controller.PostVoteHandler)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"blueblog/controller"
 	"blueblog/dao/mysql"
@@ -10,12 +11,14 @@ import (
 	"blueblog/pkg/snowflake"
 	"blueblog/router"
 	"blueblog/settings"
-
-	"go.uber.org/zap"
 )
 
 func main() {
-	if err := settings.Init(); err != nil {
+	if len(os.Args) < 2 {
+		fmt.Println("need config file.eg: blueblog config.yaml")
+		return
+	}
+	if err := settings.Init(os.Args[1]); err != nil {
 		fmt.Println("init settings failed, err:", err.Error())
 		return
 	}
@@ -24,8 +27,6 @@ func main() {
 		fmt.Println("init logger failed, err:", err.Error())
 		return
 	}
-	defer zap.L().Sync()
-	zap.L().Debug("logger init success...")
 
 	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
 		fmt.Println("init mysql failed, err:", err.Error())
