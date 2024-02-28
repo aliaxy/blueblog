@@ -1,3 +1,4 @@
+// Package mysql 数据库驱动
 package mysql
 
 import (
@@ -5,13 +6,15 @@ import (
 
 	"blueblog/settings"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" // 导入 mysql 驱动
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
+// 数据库
 var db *sqlx.DB
 
+// Init 初始化数据库连接
 func Init(cfg *settings.MySQLConfig) (err error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		cfg.User,
@@ -32,6 +35,7 @@ func Init(cfg *settings.MySQLConfig) (err error) {
 	return
 }
 
+// Close 关闭连接
 func Close() {
 	_ = db.Close()
 }

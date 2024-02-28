@@ -1,3 +1,4 @@
+// Package mysql 帖子相关
 package mysql
 
 import (

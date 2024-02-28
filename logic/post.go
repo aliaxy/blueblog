@@ -1,3 +1,4 @@
+// Package logic 帖子逻辑
 package logic
 
 import (
@@ -11,6 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// CreatePost 创建帖子
 func CreatePost(post *models.Post) (err error) {
 	// 生成 post ID
 	post.ID = snowflake.GenID()
@@ -23,7 +25,8 @@ func CreatePost(post *models.Post) (err error) {
 	return redis.CreatePost(post.ID, post.CommunityID)
 }
 
-func GetPostByID(pid int64) (data *models.ApiPostDetail, err error) {
+// GetPostByID 通过 id 查询
+func GetPostByID(pid int64) (data *models.APIPostDetail, err error) {
 	// 查询并组合数据
 	post, err := mysql.GetPostByID(pid)
 	if err != nil {
@@ -49,7 +52,7 @@ func GetPostByID(pid int64) (data *models.ApiPostDetail, err error) {
 		return
 	}
 
-	data = &models.ApiPostDetail{
+	data = &models.APIPostDetail{
 		AuthorName:      user.Username,
 		Post:            post,
 		CommunityDetail: community,
@@ -58,12 +61,13 @@ func GetPostByID(pid int64) (data *models.ApiPostDetail, err error) {
 	return
 }
 
-func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
+// GetPostList 获取所有帖子
+func GetPostList(page, size int64) (data []*models.APIPostDetail, err error) {
 	posts, err := mysql.GetPostList(page, size)
 	if err != nil {
 		return nil, err
 	}
-	data = make([]*models.ApiPostDetail, 0, len(posts))
+	data = make([]*models.APIPostDetail, 0, len(posts))
 	for _, post := range posts {
 		// 根据作者 ID 查询作者信息
 		user, err := mysql.GetUserByID(post.AuthorID)
@@ -82,7 +86,7 @@ func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
 				zap.Error(err))
 			return nil, err
 		}
-		postDetail := &models.ApiPostDetail{
+		postDetail := &models.APIPostDetail{
 			AuthorName:      user.Username,
 			Post:            post,
 			CommunityDetail: community,
@@ -104,7 +108,8 @@ func VoteForPost(userID int64, p *models.ParamVoteData) error {
 	return redis.VoteForPost(strconv.FormatInt(userID, 10), p.PostID, float64(p.Direction))
 }
 
-func getPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+// 内部接口 优化查询
+func getPostList2(p *models.ParamPostList) (data []*models.APIPostDetail, err error) {
 	// redis 查询 ID 列表
 	ids, err := redis.GetPostIDsInOrder(p)
 	if err != nil {
@@ -147,7 +152,7 @@ func getPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err er
 				zap.Error(err))
 			return nil, err
 		}
-		postDetail := &models.ApiPostDetail{
+		postDetail := &models.APIPostDetail{
 			AuthorName:      user.Username,
 			VoteNum:         voteData[idx],
 			Post:            post,
@@ -158,7 +163,8 @@ func getPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err er
 	return
 }
 
-func getCommunityPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+// 查询社区帖子
+func getCommunityPostList(p *models.ParamPostList) (data []*models.APIPostDetail, err error) {
 	// redis 查询 ID 列表
 	ids, err := redis.GetCommunityPostIDsInOrder(p)
 	if err != nil {
@@ -201,7 +207,7 @@ func getCommunityPostList(p *models.ParamPostList) (data []*models.ApiPostDetail
 				zap.Error(err))
 			return nil, err
 		}
-		postDetail := &models.ApiPostDetail{
+		postDetail := &models.APIPostDetail{
 			AuthorName:      user.Username,
 			VoteNum:         voteData[idx],
 			Post:            post,
@@ -213,7 +219,7 @@ func getCommunityPostList(p *models.ParamPostList) (data []*models.ApiPostDetail
 }
 
 // GetPostListNew 将两个查询接口合二为一
-func GetPostListNew(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+func GetPostListNew(p *models.ParamPostList) (data []*models.APIPostDetail, err error) {
 	if p.CommunityID == 0 {
 		data, err = getPostList2(p)
 	} else {

@@ -1,3 +1,4 @@
+// Package mysql 用户相关
 package mysql
 
 import (
@@ -10,6 +11,7 @@ import (
 
 const secret = "aliaxyblueblog"
 
+// CheckUserExist 检查用户是否存在
 func CheckUserExist(username string) (err error) {
 	sqlStr := "select count(*) from user where username = ?"
 	var count int
@@ -22,6 +24,7 @@ func CheckUserExist(username string) (err error) {
 	return
 }
 
+// InsertUser 插入用户
 func InsertUser(user *models.User) (err error) {
 	user.Password = encryptPassword(user.Password)
 
@@ -30,6 +33,7 @@ func InsertUser(user *models.User) (err error) {
 	return
 }
 
+// Login 登录
 func Login(user *models.User) (err error) {
 	oPassword := user.Password
 	sqlStr := "select user_id, username, password from user where username = ?"
@@ -46,6 +50,7 @@ func Login(user *models.User) (err error) {
 	return
 }
 
+// 密码加密
 func encryptPassword(oPassword string) string {
 	h := md5.New()
 	h.Write([]byte(secret))

@@ -1,8 +1,9 @@
+// Package models 请求参数相关
 package models
 
 const (
-	OrderTime  = "time"
-	OrderScore = "score"
+	OrderTime  = "time"  // OrderTime 时间排序
+	OrderScore = "score" // OrderScore 分数排序
 )
 
 // 定义请求参数的结构体

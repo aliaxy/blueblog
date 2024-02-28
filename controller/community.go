@@ -1,3 +1,4 @@
+// Package controller 社区控制层
 package controller
 
 import (
@@ -9,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// CommunityHandler
+// CommunityHandler 查询所有社区
 func CommunityHandler(ctx *gin.Context) {
 	// 查询到所有的社区 (community_id, community_name) 以列表的形式返回
 	data, err := logic.GetCommunityList()

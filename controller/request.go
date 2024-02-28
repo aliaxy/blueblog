@@ -1,3 +1,4 @@
+// Package controller 请求参数相关
 package controller
 
 import (
@@ -7,11 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CtxUserIDKey 用户 id
 const CtxUserIDKey = "userID"
 
+// ErrorUserNotLogin 用户未登录错误
 var ErrorUserNotLogin = errors.New("用户未登录")
 
-// getCurrentUser 获取当前登录用户的 ID
+// 获取当前登录用户的 ID
 func getCurrentUser(ctx *gin.Context) (userID int64, err error) {
 	uid, ok := ctx.Get(CtxUserIDKey)
 	if !ok {
@@ -27,8 +30,8 @@ func getCurrentUser(ctx *gin.Context) (userID int64, err error) {
 	return
 }
 
+// GetPageInfo  获取分页参数
 func GetPageInfo(ctx *gin.Context) (int64, int64) {
-	// 获取分页参数
 	pagetStr := ctx.DefaultQuery("page", "1")
 	sizeStr := ctx.DefaultQuery("size", "10")
 

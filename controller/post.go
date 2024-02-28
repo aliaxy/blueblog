@@ -1,3 +1,4 @@
+// Package controller 帖子相关
 package controller
 
 import (
@@ -65,7 +66,7 @@ func PostDetailHandler(ctx *gin.Context) {
 	ResponseSuccess(ctx, data)
 }
 
-// PostListHandler
+// PostListHandler 获取帖子列表
 func PostListHandler(ctx *gin.Context) {
 	page, size := GetPageInfo(ctx)
 
@@ -80,7 +81,7 @@ func PostListHandler(ctx *gin.Context) {
 	ResponseSuccess(ctx, data)
 }
 
-// PostVoteHandler
+// PostVoteHandler 帖子投票
 func PostVoteHandler(ctx *gin.Context) {
 	// 获取数据
 	p := new(models.ParamVoteData)
@@ -114,7 +115,7 @@ func PostVoteHandler(ctx *gin.Context) {
 	ResponseSuccess(ctx, nil)
 }
 
-// PostListHandler2
+// PostListHandler2 升级版帖子列表接口
 // @Summary 升级版帖子列表接口
 // @Description 可按社区按时间或分数排序查询帖子列表接口
 // @Tags 帖子相关接口

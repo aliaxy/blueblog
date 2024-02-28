@@ -1,3 +1,5 @@
+// Package settings 导入配置文件
+// 使用 viper
 package settings
 
 import (
@@ -7,8 +9,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Conf 全局访问
 var Conf = new(AppConfig)
 
+// AppConfig 应用配置
 type AppConfig struct {
 	Name      string `mapstructure:"name"`
 	Mode      string `mapstructure:"mode"`
@@ -22,6 +26,7 @@ type AppConfig struct {
 	*RedisConfig `mapstructure:"redis"`
 }
 
+// LogConfig 日志配置
 type LogConfig struct {
 	Level      string `mapstructure:"level"`
 	Filename   string `mapstructure:"filename"`
@@ -30,6 +35,7 @@ type LogConfig struct {
 	MaxBackups int    `mapstructure:"max_backups"`
 }
 
+// MySQLConfig mysql 配置
 type MySQLConfig struct {
 	Host         string `mapstructure:"host"`
 	Port         int    `mapstructure:"port"`
@@ -40,6 +46,7 @@ type MySQLConfig struct {
 	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
 
+// RedisConfig Redis 配置
 type RedisConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
@@ -48,6 +55,7 @@ type RedisConfig struct {
 	PoolSize int    `mapstructure:"pool_size"`
 }
 
+// Init 初始化
 func Init(filePath string) (err error) {
 	viper.SetConfigFile(filePath)
 

@@ -1,3 +1,4 @@
+// Package middleware 流量控制
 package middleware
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/juju/ratelimit"
 )
 
+// RateLimitMiddleware 使用令牌桶进行控制
 func RateLimitMiddleware(fillInterval time.Duration, capacity int64) func(ctx *gin.Context) {
 	bucket := ratelimit.NewBucket(fillInterval, capacity)
 	return func(ctx *gin.Context) {

@@ -1,3 +1,4 @@
+// Package logic 用户逻辑
 package logic
 
 import (
@@ -7,6 +8,7 @@ import (
 	"blueblog/pkg/snowflake"
 )
 
+// SignUp 请求注册
 func SignUp(p *models.ParamSignUp) (err error) {
 	// 判断用户是否存在
 	if err = mysql.CheckUserExist(p.Username); err != nil {
@@ -14,11 +16,11 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	}
 
 	// 生成 UID
-	userId := snowflake.GenID()
+	userID := snowflake.GenID()
 
 	// 构造 User 实例
 	user := &models.User{
-		UserID:   userId,
+		UserID:   userID,
 		Username: p.Username,
 		Password: p.Password,
 	}
@@ -27,6 +29,7 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	return mysql.InsertUser(user)
 }
 
+// Login 请求登录
 func Login(p *models.ParamLogin) (user *models.User, err error) {
 	user = &models.User{
 		Username: p.Username,

@@ -1,3 +1,4 @@
+// Package redis 帖子相关
 package redis
 
 import (
@@ -13,15 +14,18 @@ import (
 )
 
 const (
-	oneWeekInSeconds = 7 * 24 * 3600
-	scorePerVote     = 432 // 每一票的分数
+	oneWeekInSeconds = 7 * 24 * 3600 // 一周的时间 单位秒
+	scorePerVote     = 432           // 每一票的分数
 )
 
 var (
+	// ErrVoteTimeExpire 投票时间已过
 	ErrVoteTimeExpire = errors.New("投票时间已过")
-	ErrVoteRepeated   = errors.New("不允许重复投票")
+	// ErrVoteRepeated 不允许重复投票
+	ErrVoteRepeated = errors.New("不允许重复投票")
 )
 
+// CreatePost 创建帖子
 func CreatePost(postID, communityID int64) error {
 	pipeline := client.TxPipeline()
 	// 帖子时间
@@ -45,6 +49,7 @@ func CreatePost(postID, communityID int64) error {
 	return err
 }
 
+// VoteForPost 为帖子投票
 func VoteForPost(userID, postID string, value float64) error {
 	// 判断投票限制
 	postTIme := client.ZScore(ctx, getRedisKey(KeyPostTime), postID).Val()
@@ -87,6 +92,7 @@ func VoteForPost(userID, postID string, value float64) error {
 	return err
 }
 
+// 查询 id
 func getIDsFromKey(key string, page, size int64) ([]string, error) {
 	// 确定查询的索引起始点
 	start := (page - 1) * size
@@ -96,6 +102,7 @@ func getIDsFromKey(key string, page, size int64) ([]string, error) {
 	return client.ZRevRange(ctx, key, start, end).Result()
 }
 
+// GetPostIDsInOrder 顺序得到帖子 id
 func GetPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
 	// 从 redis 获取 ID
 	key := getRedisKey(KeyPostTime)

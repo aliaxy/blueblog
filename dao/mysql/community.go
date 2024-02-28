@@ -1,3 +1,4 @@
+// Package mysql 社区相关操作
 package mysql
 
 import (
@@ -8,6 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// GetCommunityList 获取社区列表
 func GetCommunityList() (communityList []*models.Community, err error) {
 	sqlStr := "select community_id, community_name from community"
 	if err = db.Select(&communityList, sqlStr); err != nil {
@@ -19,6 +21,7 @@ func GetCommunityList() (communityList []*models.Community, err error) {
 	return
 }
 
+// GetCommunityDetailByID 通过 id 查询社区详情
 func GetCommunityDetailByID(id int64) (community *models.CommunityDetail, err error) {
 	sqlStr := `select
 		community_id, community_name, introduction, create_time

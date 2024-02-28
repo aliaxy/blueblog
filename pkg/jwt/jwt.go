@@ -1,3 +1,4 @@
+// Package jwt 鉴权组件
 package jwt
 
 import (

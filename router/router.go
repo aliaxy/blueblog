@@ -1,10 +1,11 @@
+// Package router 路由注册相关
 package router
 
 import (
 	"net/http"
 
 	"blueblog/controller"
-	_ "blueblog/docs"
+	_ "blueblog/docs" // 文档相关 导入
 	"blueblog/logger"
 	"blueblog/middleware"
 
@@ -14,6 +15,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// Setup 注册路由
 func Setup(mode string) *gin.Engine {
 	if mode == gin.ReleaseMode {
 		gin.SetMode(gin.ReleaseMode)

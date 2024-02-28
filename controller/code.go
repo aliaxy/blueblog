@@ -1,17 +1,19 @@
+// Package controller 状态码定义
 package controller
 
+// ResCode 返回类型定义
 type ResCode int64
 
 const (
-	CodeSuccess ResCode = 1_000 + iota
-	CodeInvalidParams
-	CodeUserExist
-	CodeUserNotExist
-	CodeInvalidPassword
-	CodeServerBusy
+	CodeSuccess         ResCode = 1_000 + iota // CodeSuccess 成功
+	CodeInvalidParams                          // CodeInvalidParams 非法参数
+	CodeUserExist                              // CodeUserExist 用户存在
+	CodeUserNotExist                           // CodeUserNotExist 用户不存在
+	CodeInvalidPassword                        // CodeInvalidPassword 密码错误
+	CodeServerBusy                             // CodeServerBusy 服务繁忙
 
-	CodeInvalidToken // 认证失败
-	CodeNeedLogin
+	CodeInvalidToken // CodeInvalidToken 认证失败
+	CodeNeedLogin    // CodeNeedLogin 需要登录
 )
 
 var codeMessageMap = map[ResCode]string{
@@ -26,6 +28,7 @@ var codeMessageMap = map[ResCode]string{
 	CodeNeedLogin:    "需要登录",
 }
 
+// Msg 映射错误码
 func (c ResCode) Msg() string {
 	msg, ok := codeMessageMap[c]
 	if !ok {
