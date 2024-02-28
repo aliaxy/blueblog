@@ -1,5 +1,5 @@
 name: "blueblog"
-mode: "release"
+mode: "dev"
 port: 8080
 version: "v0.0.1"
 start_time: "2023-07-01"
@@ -16,8 +16,8 @@ log:
   max_backups: 7
 
 mysql:
-  host: mysql
-  port: 3306
+  host: localhost
+  port: 13306
   user: "root"
   password: "211010"
   dbname: "blueblog"
@@ -25,7 +25,7 @@ mysql:
   max_idle_conns: 50
 
 redis:
-  host: redis
+  host: localhost
   port: 16379
   db: 0
   password: ""
