@@ -1,5 +1,5 @@
 name: "blueblog"
-mode: "release"
+mode: "dev"
 port: 8888
 version: "v0.0.1"
 start_time: "2023-07-01"
