@@ -13,6 +13,7 @@
 * `jwt-go` JWT 库
 * `swagger` 生成接口文档
 * `ratelimit` 令牌桶限流
+* `validator` 参数校验
 
 * `wrk` 压测
 * `pprof` 性能分析
