@@ -1,6 +1,6 @@
 name: "blueblog"
 mode: "release"
-port: 8080
+port: 8888
 version: "v0.0.1"
 start_time: "2023-07-01"
 machine_id: 1
@@ -26,7 +26,7 @@ mysql:
 
 redis:
   host: redis
-  port: 16379
+  port: 6379
   db: 0
   password: ""
   pool_size: 100

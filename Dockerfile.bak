@@ -19,29 +19,22 @@ RUN go mod download
 COPY . .
 
 # 将我们的代码编译成二进制可执行文件 blueblog_app
-RUN go build -o blueblog .
+RUN go build -o blueblog_app .
 
 ###################
 # 接下来创建一个小镜像
 ###################
-FROM debian:latest
+FROM scratch
 
-
-COPY ./wait.sh /
 COPY ./templates /templates
 COPY ./static /static
 COPY ./conf /conf
 
 # 从builder镜像中把/dist/app 拷贝到当前目录
-COPY --from=builder /build/blueblog /
-
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y \
-    --no-install-recommends \
-    netcat; \
-    chmod 755 wait.sh
+COPY --from=builder /build/blueblog_app /
 
 # 声明服务端口
-EXPOSE 8888
+EXPOSE 8080
 
+# 需要运行的命令
+ENTRYPOINT ["/blueblog_app", "conf/config.yaml"]
