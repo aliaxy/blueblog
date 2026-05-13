@@ -10,7 +10,7 @@ auth:
 
 log:
   level: "debug"
-  filename: "blueblog.log"
+  filename: "logs/blueblog.log"
   max_size: 200      # 单文件最大 MB
   max_age: 30        # 保留天数
   max_backups: 7     # 最多备份份数

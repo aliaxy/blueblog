@@ -2,8 +2,10 @@
 blueblog
 main
 
-# ── 日志 ──────────────────────────────────────────────────
+# ── 日志（切分后输出至 logs/，目录由 logs/.gitkeep 追踪）──
 *.log
+logs/*
+!logs/.gitkeep
 
 # ── 配置文件（含敏感信息，使用 *.example 作为模板）──────────
 conf/config.yaml
