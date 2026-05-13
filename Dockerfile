@@ -27,7 +27,7 @@ RUN go build -o blueblog .
 FROM debian:latest
 
 
-COPY ./wait.sh /
+COPY ./scripts/wait.sh /
 COPY ./web/templates /web/templates
 COPY ./web/static /web/static
 COPY ./conf /conf

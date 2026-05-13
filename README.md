@@ -40,7 +40,9 @@ blueblog/
 ├── settings/           # 配置加载
 ├── static/             # 前端静态资源
 ├── templates/          # HTML 模板
-├── init.sql            # 数据库初始化脚本
+├── scripts/
+│   ├── init.sql        # 数据库初始化脚本
+│   └── wait.sh         # Docker 服务就绪等待脚本
 ├── docker-compose.yml
 └── Dockerfile
 ```
@@ -89,7 +91,7 @@ docker-compose up -d
 1. 初始化数据库
 
 ```bash
-mysql -u root -p < init.sql
+mysql -u root -p < scripts/init.sql
 ```
 
 2. 修改配置文件

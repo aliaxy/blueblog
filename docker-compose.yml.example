@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: "blueblog"
       MYSQL_PASSWORD: "your_password"
     volumes:
-      - ./init.sql:/data/application/init.sql
+      - ./scripts/init.sql:/data/application/init.sql
 
   redis:
     image: "redis:latest"
