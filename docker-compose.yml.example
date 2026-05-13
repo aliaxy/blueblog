@@ -7,9 +7,9 @@ services:
       - "23306:3306"
     command: "--default-authentication-plugin=mysql_native_password --init-file /data/application/init.sql"
     environment:
-      MYSQL_ROOT_PASSWORD: "211010"
+      MYSQL_ROOT_PASSWORD: "your_root_password"
       MYSQL_DATABASE: "blueblog"
-      MYSQL_PASSWORD: "211010"
+      MYSQL_PASSWORD: "your_password"
     volumes:
       - ./init.sql:/data/application/init.sql
 
