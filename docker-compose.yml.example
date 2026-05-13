@@ -4,12 +4,11 @@ services:
     image: "mysql:latest"
     ports:
       - "23306:3306"
-    command: "--init-file /data/application/init.sql"
     environment:
       MYSQL_ROOT_PASSWORD: "your_root_password"
       MYSQL_DATABASE: "blueblog"
     volumes:
-      - ./scripts/init.sql:/data/application/init.sql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   redis:
     image: "redis:latest"
