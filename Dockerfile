@@ -28,8 +28,8 @@ FROM debian:latest
 
 
 COPY ./wait.sh /
-COPY ./templates /templates
-COPY ./static /static
+COPY ./web/templates /web/templates
+COPY ./web/static /web/static
 COPY ./conf /conf
 
 # 从builder镜像中把/dist/app 拷贝到当前目录

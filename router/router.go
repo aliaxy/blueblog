@@ -27,8 +27,8 @@ func Setup(mode string) *gin.Engine {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.LoadHTMLFiles("./templates/index.html")
-	r.Static("/static", "./static")
+	r.LoadHTMLFiles("./web/templates/index.html")
+	r.Static("/static", "./web/static")
 
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
