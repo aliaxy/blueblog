@@ -44,6 +44,11 @@ func CreatePost(postID, communityID int64) error {
 	cKey := getRedisKey(KeyCommunityPrefix + strconv.FormatInt(communityID, 10))
 	pipeline.SAdd(ctx, cKey, postID)
 
+	// 清除该社区的 ZSet 缓存（时间排序和分数排序），实现发布新贴后即时重新生成缓存
+	communityStr := strconv.FormatInt(communityID, 10)
+	pipeline.Del(ctx, getRedisKey(KeyPostTime)+communityStr)
+	pipeline.Del(ctx, getRedisKey(KeyPostScore)+communityStr)
+
 	_, err := pipeline.Exec(ctx)
 
 	return err
@@ -155,7 +160,7 @@ func GetCommunityPostIDsInOrder(p *models.ParamPostList) ([]string, error) {
 	cKey := getRedisKey(KeyCommunityPrefix + strconv.FormatInt(p.CommunityID, 10))
 
 	key := orderKey + strconv.FormatInt(p.CommunityID, 10)
-	if client.Exists(ctx, orderKey).Val() < 1 {
+	if client.Exists(ctx, key).Val() < 1 {
 		// 因为是第一次查询，需要根据 post 的 create_time 给 post 分数
 		pipeline := client.Pipeline()
 		pipeline.ZInterStore(ctx, key, &redis.ZStore{
