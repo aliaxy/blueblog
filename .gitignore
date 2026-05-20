@@ -1,31 +1,88 @@
-# ── 编译产物 ──────────────────────────────────────────────
+# ==============================================================================
+# 🔵 BlueBlog - Comprehensive Gitignore Specification
+# ==============================================================================
+
+# ── 1. 编译产物与可执行二进制 (Go Binaries) ──
 blueblog
 main
+main.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
 
-# ── 日志（切分后输出至 logs/，目录由 logs/.gitkeep 追踪）──
+# ── 2. 测试、覆盖率与性能分析产物 (Testing & Profiles) ──
+*.out
+*.test
+*.prof
+*.cpu
+*.mem
+coverage.html
+coverage.txt
+coverage.out
+
+# ── 3. 日志记录 (Logs) ──
 *.log
 logs/*
 !logs/.gitkeep
 
-# ── 配置文件（含敏感信息，使用 *.example 作为模板）──────────
+# ── 4. 本地环境与敏感配置文件 (Local Environment & Configs) ──
+# 敏感的配置文件只上传 *.example 做模板，忽略本地实际的配置
+conf/*.yaml
+!conf/*.example.yaml
+!conf/config.yaml.example
+
+# 包含特定后缀的本地配置文件
+conf/*_local.yaml
+conf/config_local.yaml
 conf/config.yaml
 conf/dev.yaml
+
+# 本地环境变量与凭证
+.env
+.env.local
+.env.*.local
+.envrc.private
+
+# 本地 Docker Compose 覆盖配置
 docker-compose.yml
+docker-compose.override.yml
 
-# ── 测试 & 性能分析产物 ────────────────────────────────────
-*.out
-coverage.html
 
-# ── 临时目录 ───────────────────────────────────────────────
-/tmp
+# ── 5. Nix 开发环境与 direnv 缓存 (Nix & direnv) ──
+.direnv/
+.envrc
 
-# ── Nix / direnv ──────────────────────────────────────────
-.direnv
-
-# ── 操作系统 ───────────────────────────────────────────────
+# ── 6. 操作系统相关临时垃圾文件 (OS Generated Files) ──
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# ── IDE ───────────────────────────────────────────────────
+# ── 7. 主流 IDE / 文本编辑器配置 (IDEs & Editors) ──
+# JetBrains (GoLand, IntelliJ)
 .idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Vim / Emacs
+*~
+*.swp
+*.swo
+.netrwhist
+
+# ── 8. 前端及第三方依赖 (Dependencies - if any) ──
+node_modules/
+/vendor/
