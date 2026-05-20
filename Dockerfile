@@ -39,7 +39,7 @@ RUN set -eux; \
     apt-get update; \
     apt-get install -y \
     --no-install-recommends \
-    netcat; \
+    netcat-openbsd; \
     chmod 755 wait.sh
 
 # 声明服务端口
