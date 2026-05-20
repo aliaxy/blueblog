@@ -1,23 +1,259 @@
 <!DOCTYPE html>
-<html lang=zh-CN>
-
+<html lang="zh-CN">
 <head>
-    <meta charset=utf-8>
-    <meta http-equiv=X-UA-Compatible content="IE=edge">
-    <meta name=viewport content="width=device-width,initial-scale=1">
-    <link rel=icon href=/static/favicon.ico>
-    <title>bluebell_frontend</title>
-    <link href=/static/css/app.50fb5caf.css rel=preload as=style>
-    <link href=/static/js/app.7fce8887.js rel=preload as=script>
-    <link href=/static/js/chunk-vendors.57f9e9d6.js rel=preload as=script>
-    <link href=/static/css/app.50fb5caf.css rel=stylesheet>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/favicon.ico">
+    <title>BlueBlog - Apple Style 社区论坛</title>
+    
+    <!-- 引入 Apple 首选现代字体 Inter 与 Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 引入自定义样式 -->
+    <link href="/static/css/modern.css" rel="stylesheet">
 </head>
+<body class="light-theme"> <!-- 默认浅色主题，支持动态切换 -->
+    
+    <!-- 顶部半透明磨砂导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand" id="brand-logo">
+                <span class="logo-icon">🔵</span>
+                <span class="logo-text">BlueBlog</span>
+            </div>
+            
+            <div class="nav-search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="global-search" placeholder="搜索帖子、标签..." disabled title="全文搜索将在下一迭代版本中提供">
+            </div>
 
-<body><noscript><strong>We're sorry but blueblug_frontend doesn't work properly without JavaScript enabled. Please
-            enable it to continue.</strong></noscript>
-    <div id=app></div>
-    <script src=/static/js/chunk-vendors.57f9e9d6.js></script>
-    <script src=/static/js/app.7fce8887.js></script>
+            <div class="nav-actions">
+                <!-- 主题切换按钮 -->
+                <button class="theme-toggle-btn" id="theme-toggle" title="切换深色/浅色模式">🌓</button>
+                
+                <!-- 写文章按钮 (已登录用户) -->
+                <button class="btn btn-primary" id="btn-create-post-trigger" style="display: none;">
+                    <span class="btn-icon">✍️</span>写帖子
+                </button>
+                
+                <!-- 登录/注册按钮 (未登录用户) -->
+                <div class="auth-buttons" id="auth-nav-group">
+                    <button class="btn btn-secondary" id="btn-login-trigger">登录</button>
+                    <button class="btn btn-primary" id="btn-signup-trigger">注册</button>
+                </div>
+                
+                <!-- 用户头像/信息 (已登录用户) -->
+                <div class="user-menu" id="user-nav-profile" style="display: none;">
+                    <div class="avatar" id="nav-user-avatar">U</div>
+                    <span class="username-display" id="nav-username">用户名</span>
+                    <button class="btn btn-text" id="btn-logout" title="退出登录">退出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主体容器 (两栏布局 Grid) -->
+    <main class="main-container">
+        <!-- 左侧核心帖子板块 -->
+        <section class="content-section">
+            <!-- 头部：系统级分段控制器 Segmented Control -->
+            <div class="feed-header">
+                <div class="segmented-control" id="sort-control">
+                    <input type="radio" name="sort" id="sort-time" value="time" checked>
+                    <label for="sort-time" class="segment-item">最新发布</label>
+                    
+                    <input type="radio" name="sort" id="sort-score" value="score">
+                    <label for="sort-score" class="segment-item">热门推荐</label>
+                    
+                    <div class="segment-slider"></div>
+                </div>
+                
+                <div class="filter-indicator" id="filter-indicator" style="display: none;">
+                    当前社区: <span class="tag" id="current-filter-tag">Go</span>
+                    <button class="btn btn-close-tag" id="btn-clear-filter">×</button>
+                </div>
+            </div>
+            
+            <!-- 动态帖子列表容器 -->
+            <div class="posts-feed" id="posts-container">
+                <!-- 预加载骨架屏 Skeleton -->
+                <div class="skeleton-card">
+                    <div class="skeleton-vote"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line skeleton-title"></div>
+                        <div class="skeleton-line skeleton-text"></div>
+                        <div class="skeleton-line skeleton-meta"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页加载区 -->
+            <div class="feed-footer" style="text-align: center; margin: 24px 0 32px;">
+                <button class="btn btn-secondary" id="btn-load-more" style="display: none; padding: 10px 40px; font-weight: 600;">加载更多帖子</button>
+            </div>
+        </section>
+
+        <!-- 右侧侧边栏 Sidebar -->
+        <aside class="sidebar-section">
+            <!-- 用户面板 / 欢迎面板 -->
+            <div class="apple-card profile-card" id="sidebar-welcome-card">
+                <div class="profile-header">
+                    <div class="avatar-large"></div>
+                    <div class="welcome-text">
+                        <h3>欢迎来到 BlueBlog</h3>
+                        <p>探讨技术、分享日常的极简社区</p>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn-primary btn-block" id="sidebar-action-btn">立即登录参与互动</button>
+                </div>
+            </div>
+            
+            <!-- 社区分类面板 -->
+            <div class="apple-card community-card">
+                <h3 class="card-title">🔍 探索社区板块</h3>
+                <div class="community-list" id="community-sidebar-list">
+                    <!-- 动态载入社区列表 -->
+                    <div class="skeleton-sidebar-item"></div>
+                    <div class="skeleton-sidebar-item"></div>
+                </div>
+            </div>
+            
+            <!-- 苹果精美底部声明 -->
+            <footer class="system-footer">
+                <p>Designed with Apple Philosophy</p>
+                <p>Copyright &copy; 2026 BlueBlog. All rights reserved.</p>
+            </footer>
+        </aside>
+    </main>
+
+    <!-- ================== 弹窗组件群 (Modal Group) ================== -->
+    
+    <!-- 1. 登录与注册统一遮罩弹窗 -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="apple-modal">
+            <button class="modal-close" id="btn-auth-close">&times;</button>
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" id="tab-login">登录</button>
+                <button class="auth-tab-btn" id="tab-signup">注册</button>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form id="form-login" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-username">账号名称</label>
+                    <input type="text" id="login-username" placeholder="请输入你的用户名" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">安全密码</label>
+                    <input type="password" id="login-password" placeholder="请输入你的密码" required autocomplete="current-password">
+                </div>
+                <div class="form-error" id="login-error-msg"></div>
+                <button type="submit" class="btn btn-primary btn-block btn-large">
+                    <span class="spinner" id="login-spinner"></span>确认登录
+                </button>
+            </form>
+            
+            <!-- 注册表单 -->
+            <form id="form-signup" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-username">账号名称</label>
+                    <input type="text" id="signup-username" placeholder="数字与字母组合，最少4位" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">设置密码</label>
+                    <input type="password" id="signup-password" placeholder="建议使用复杂密码，最少6位" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="signup-repassword">确认密码</label>
+                    <input type="password" id="signup-repassword" placeholder="请再次确认输入密码" required autocomplete="new-password">
+                </div>
+                <div class="form-error" id="signup-error-msg"></div>
+                <button type="submit" class="btn btn-primary btn-block btn-large">
+                    <span class="spinner" id="signup-spinner"></span>同意并创建账号
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. 发布新帖遮罩弹窗 -->
+    <div class="modal-overlay" id="post-modal">
+        <div class="apple-modal modal-large">
+            <button class="modal-close" id="btn-post-close">&times;</button>
+            <h3 class="modal-title">📝 创建新帖子</h3>
+            
+            <form id="form-create-post">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="post-community">发布到板块</label>
+                        <select id="post-community" class="form-select" required>
+                            <option value="" disabled selected>选择目标社区分类</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-title">帖子标题</label>
+                    <input type="text" id="post-title" placeholder="给你的讨论起一个引人注目的标题..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-content">帖子内容</label>
+                    <textarea id="post-content" rows="12" placeholder="在此分享你的真知灼见，系统支持 Markdown 基础文本..." required></textarea>
+                </div>
+                
+                <div class="form-error" id="post-error-msg"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-post-cancel">取消</button>
+                    <button type="submit" class="btn btn-primary btn-large">
+                        <span class="spinner" id="post-submit-spinner"></span>确认发布
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. 帖子全文阅读弹窗 -->
+    <div class="modal-overlay" id="detail-modal">
+        <div class="apple-modal modal-large article-modal">
+            <button class="modal-close" id="btn-detail-close">&times;</button>
+            
+            <div class="article-container" id="detail-article-body">
+                <!-- 动态装载的帖子内容 -->
+                <div class="detail-header">
+                    <span class="tag" id="detail-community-tag">板块</span>
+                    <h1 class="detail-title" id="detail-title">帖子标题</h1>
+                    <div class="detail-meta">
+                        <div class="avatar-small">U</div>
+                        <div class="meta-info">
+                            <span class="author" id="detail-author">作者名</span>
+                            <span class="time" id="detail-time">发布于 2026-05-20</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="article-content" id="detail-content">
+                    帖子正文内容...
+                </div>
+                
+                <div class="detail-footer">
+                    <div class="detail-vote-action">
+                        <span class="vote-prompt">对该帖子表达你的态度：</span>
+                        <div class="vote-buttons-group">
+                            <button class="vote-action-btn up" id="detail-vote-up" title="点赞">▲ 赞同</button>
+                            <span class="vote-score-display" id="detail-vote-count">0</span>
+                            <button class="vote-action-btn down" id="detail-vote-down" title="踩">▼ 踩</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入自定义前端核心交互脚本 -->
+    <script src="/static/js/app.js"></script>
 </body>
-
 </html>
